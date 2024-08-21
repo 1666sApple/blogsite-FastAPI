@@ -14,5 +14,9 @@ class BlogModel(BaseModel):
     published: Optional[bool]
     
 @router.post('/new')
-def create_blog(blog: BlogModel):
-    return {'data': blog}
+def create_blog(blog: BlogModel, id: int, version: int):
+    return {
+        'id': id,
+        'data': blog,
+        'version': version
+    }
