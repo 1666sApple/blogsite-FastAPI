@@ -7,7 +7,8 @@ app = FastAPI()
 @app.get(
     '/',
     summary="Home Endpoint", 
-    description="Returns a welcome message."
+    description="Returns a welcome message.",
+    response_description="A JSON object containing a welcome message."
 )
 def home():
     """
@@ -22,7 +23,8 @@ def home():
     '/blogs/all', 
     tags=['blog'], 
     summary="Get All Blogs", 
-    description="Retrieve a message indicating that all blogs are provided."
+    description="Retrieve a message indicating that all blogs are provided.",
+    response_description="A JSON object confirming that all blogs are provided."
 )
 def get_all():
     """
@@ -39,7 +41,8 @@ def get_all():
     '/blogs', 
     tags=['blog'], 
     summary="Get Blogs with Pagination", 
-    description="Fetch a list of blogs with pagination options."
+    description="Fetch a list of blogs with pagination options.",
+    response_description="A JSON object containing the page number and page size."
 )
 def get_blog_query(page: int = 1, page_size: Optional[int] = None):
     """
@@ -60,7 +63,8 @@ def get_blog_query(page: int = 1, page_size: Optional[int] = None):
     '/blogs/{blog_id}/comments/{comment_id}', 
     tags=['blog', 'comment'], 
     summary="Get Blog Comments", 
-    description="Retrieve a specific comment for a given blog by its ID."
+    description="Retrieve a specific comment for a given blog by its ID.",
+    response_description="A JSON object containing the blog ID, comment ID, validity, and username."
 )
 def get_comment(blog_id: int, comment_id: int, valid: bool = True, username: Optional[str] = None):
     """
@@ -88,7 +92,8 @@ class BlogType(str, Enum):
     '/blogs/types/{blog_type}', 
     tags=['blog', 'type'], 
     summary="Get Blogs by Type", 
-    description="Fetch blogs of a specific type such as short, story, or how-to."
+    description="Fetch blogs of a specific type such as short, story, or how-to.",
+    response_description="A JSON object indicating the type of blogs being fetched."
 )
 def get_blog_type(blog_type: BlogType):
     """
@@ -109,7 +114,8 @@ def get_blog_type(blog_type: BlogType):
     status_code=status.HTTP_200_OK, 
     tags=['blog'], 
     summary="Get Blog by ID", 
-    description="Retrieve a specific blog by its ID. Returns a 404 error if the blog is not found."
+    description="Retrieve a specific blog by its ID. Returns a 404 error if the blog is not found.",
+    response_description="A JSON object containing the blog ID if found, or an error message if not found."
 )
 def get_blog(blog_id: int, response: Response):
     """
