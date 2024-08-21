@@ -8,19 +8,19 @@ app = FastAPI()
 def home():
     return {'message':'Hello World'}
 
-@app.get('/blogs/all')
+@app.get('/blogs/all', tags=['blog'])
 def get_all():
     return {
         'message':'All blogs provided'
     }
 
-@app.get('/blogs')
+@app.get('/blogs', tags=['blog'])
 def get_blog_query(page: int = 1, page_size: Optional[int] = None):
     return {
         'message': f'Fetching blogs, page: {page}, page_size: {page_size}'
     }
 
-@app.get('/blogs/{blog_id}/comments/{comment_id}')
+@app.get('/blogs/{blog_id}/comments/{comment_id}', tags=['blog', 'comment'])
 def get_comment(blog_id: int, comment_id: int, valid: bool=True, username: Optional[str] = None):
     return {
         'message': f"blog {blog_id}, comment_id {comment_id}, valid {valid}, username {username}"
@@ -31,13 +31,13 @@ class BlogType(str, Enum):
     story = 'story'
     howto = 'howto'
 
-@app.get('/blogs/types/{blog_type}')
+@app.get('/blogs/types/{blog_type}', tags=['blog', 'type'])
 def get_blog_type(blog_type: BlogType):
     return {
         'message':f"Fetching blogs of type: {blog_type}"
     }
 
-@app.get("/blogs/{blog_id}", status_code=status.HTTP_200_OK)
+@app.get("/blogs/{blog_id}", status_code=status.HTTP_200_OK, tags=['blog'])
 def get_blog(blog_id: int, response: Response):
     if blog_id > 25:
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -49,3 +49,4 @@ def get_blog(blog_id: int, response: Response):
         return {
             'message': f'Fetching blog with id: {blog_id}'
         }
+        
