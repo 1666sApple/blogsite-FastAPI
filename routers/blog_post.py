@@ -61,5 +61,3 @@ def create_comment(
         'content': content,
         'version': version
     }
-
-app.include_router(router)
