@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Query, Body
+from fastapi import FastAPI, APIRouter, Query, Body, Path
 from typing import Optional, List
 from pydantic import BaseModel
 
@@ -29,21 +29,22 @@ def create_blog(blog: BlogModel, id: int, version: int):
         'version': version
     }
     
-@router.post('/new/{id}/comment')
+@router.post('/new/{id}/comment/{comment_id}')
 def create_comment(
     id: int,
-    comment_id: int = Query(...,
-        title='Id of the comment',
+    comment_title: str = Query(...,
+        title='Title of the comment',
         description='Description for the comment',
-        alias='commentId'
+        alias='commentTitle'
     ),
     content: str = Body(
         ...,
         min_length=10,
         max_length=50
     ),
-    version: Optional[List[str]] = Query(None),
-    blog: BlogModel = Body(...)
+    version: Optional[List[str]] = Query(['1.0', '1.1', '1.2', '1.3', '1.4', '1.5']),
+    blog: BlogModel = Body(...),
+    comment_id: int = Path(..., gt=5, le=10)
 ):
     """
     Create a new comment for a blog post.
@@ -57,7 +58,7 @@ def create_comment(
     return {
         'blog': blog,
         'blog_id': id,
-        'comment_id': comment_id,
+        'comment_title': comment_title,
         'content': content,
         'version': version
     }
