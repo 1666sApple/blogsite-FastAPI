@@ -1,11 +1,9 @@
 from fastapi import FastAPI, APIRouter, Query, Body, Path
 from typing import Optional, List, Dict
 from pydantic import BaseModel
-
 app = FastAPI()
 router = APIRouter(
     prefix='/blog',
-    tags=['blog']
 )
 
 class Image(BaseModel):
@@ -69,3 +67,6 @@ def create_comment(
         'content': content,
         'version': version
     }
+    
+def required_fn():
+    return {'message':"fastAPI imported"}
