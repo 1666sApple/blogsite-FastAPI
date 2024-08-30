@@ -1,6 +1,10 @@
-from fastapi import FastAPI, status, Response, APIRouter
+from typing_extensions import Required
+from fastapi import FastAPI, status, Response, APIRouter, Depends
+from routers.blog_post import required_fn
 from enum import Enum
 from typing import Optional
+
+from routers.blog_post import required_fn
 
 router = APIRouter(
     prefix='/blog',
@@ -30,7 +34,7 @@ def get_all():
     description="Fetch a list of blogs with pagination options.",
     response_description="A JSON object containing the page number and page size."
     )
-def get_blog_query(page: int = 1, page_size: Optional[int] = None):
+def get_blog_query(page: int = 1, page_size: Optional[int] = None, req_parameter: dict = Depends(required_fn)):
     """
     Fetch a list of blogs with pagination.
 
