@@ -17,7 +17,7 @@ router = APIRouter(
     description="Retrieve a message indicating that all blogs are provided.",
     response_description="A JSON object confirming that all blogs are provided."
     )
-def get_all():
+def get_all(page: int = 1, page_size: Optional[int] = None, req_parameter: dict = Depends(required_fn)):
     """
     Retrieve a message indicating that all blogs are available.
 
@@ -25,7 +25,8 @@ def get_all():
         dict: A JSON object with a message confirming that all blogs are provided.
     """
     return {
-        'message': 'All blogs provided'
+        'message': 'All blogs provided',
+        'req' : req_parameter
     }
 
 @router.get(
@@ -46,7 +47,8 @@ def get_blog_query(page: int = 1, page_size: Optional[int] = None, req_parameter
         dict: A JSON object containing the page number and page size.
     """
     return {
-        'message': f'Fetching blogs, page: {page}, page_size: {page_size}'
+        'message': f'Fetching blogs, page: {page}, page_size: {page_size}',
+        'req' : req_parameter
     }
 
 @router.get(
@@ -56,7 +58,7 @@ def get_blog_query(page: int = 1, page_size: Optional[int] = None, req_parameter
     description="Retrieve a specific comment for a given blog by its ID.",
     response_description="A JSON object containing the blog ID, comment ID, validity, and username."
     )
-def get_comment(blog_id: int, comment_id: int, valid: bool = True, username: Optional[str] = None):
+def get_comment(blog_id: int, comment_id: int, valid: bool = True, username: Optional[str] = None, req_parameter: dict = Depends(required_fn)):
     """
     Retrieve a specific comment for a given blog.
 
@@ -70,7 +72,8 @@ def get_comment(blog_id: int, comment_id: int, valid: bool = True, username: Opt
         dict: A JSON object containing the blog ID, comment ID, validity, and username.
     """
     return {
-        'message': f"blog {blog_id}, comment_id {comment_id}, valid {valid}, username {username}"
+        'message': f"blog {blog_id}, comment_id {comment_id}, valid {valid}, username {username}",
+        'req' : req_parameter
     }
 
 class BlogType(str, Enum):
@@ -85,7 +88,7 @@ class BlogType(str, Enum):
     description="Fetch blogs of a specific type such as short, story, or how-to.",
     response_description="A JSON object indicating the type of blogs being fetched."
     )
-def get_blog_type(blog_type: BlogType):
+def get_blog_type(blog_type: BlogType, req_parameter: dict = Depends(required_fn)):
     """
     Fetch blogs of a specific type.
 
@@ -96,7 +99,8 @@ def get_blog_type(blog_type: BlogType):
         dict: A JSON object indicating the type of blogs being fetched.
     """
     return {
-        'message': f"Fetching blogs of type: {blog_type}"
+        'message': f"Fetching blogs of type: {blog_type}",
+        'req' : req_parameter
     }
 
 @router.get(
@@ -106,7 +110,7 @@ def get_blog_type(blog_type: BlogType):
     description="Retrieve a specific blog by its ID. Returns a 404 error if the blog is not found.",
     response_description="A JSON object containing the blog ID if found, or an error message if not found."
     )
-def get_blog(blog_id: int, response: Response):
+def get_blog(blog_id: int, page_size: Optional[int], response: Response, req_parameter: dict = Depends(required_fn)):
     """
     Retrieve a specific blog by its ID.
 
@@ -124,5 +128,6 @@ def get_blog(blog_id: int, response: Response):
     else:
         response.status_code = status.HTTP_200_OK
         return {
-            'message': f'Fetching blog with id: {blog_id}'
+            'message': f'Fetching blog with id: {blog_id}',
+            'req' : req_parameter
         }
