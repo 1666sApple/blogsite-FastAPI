@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
+from exception import StoryException
 from routers import article, blog_get, blog_post, user
 from db import models
 from db.database import engine
@@ -23,5 +25,18 @@ def home():
         dict: A JSON object containing a welcome message.
     """
     return {'message': 'Hello World'}
+
+@app.exception_handler(StoryException)
+def storyExceptionHandler(request: Request, exc: StoryException):
+    return JSONResponse(
+        status_code=418,
+        content={
+            'detail' : exc.name
+            }
+    )
+
+@app.exception_handler(HTTPException)
+def customHandler(request: Request, exc: StoryException):
+    return PlainTextResponse(str(exc), status_code=400)
 
 models.Base.metadata.create_all(engine)
