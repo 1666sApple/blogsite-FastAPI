@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session
 from db.models import DBarticles
+from exception import StoryException
 from schemas import ArticleBase
 
 def createArticle(db: Session, request: ArticleBase):
+    if request.content.startswith('Once Upon a time'):
+        raise StoryException
     existing_article = db.query(DBarticles).filter(DBarticles.title == request.title).first()
     if existing_article:
         return None
