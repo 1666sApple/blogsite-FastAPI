@@ -1,5 +1,7 @@
+from math import prod
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
+from auth import authentication
 from exception import StoryException
 from routers import article, blog_get, blog_post, user
 from db import models
@@ -10,6 +12,8 @@ app.include_router(blog_get.router)
 app.include_router(blog_post.router)
 app.include_router(user.router)
 app.include_router(article.router)
+app.include_router(authentication.router)
+
 
 @app.get(
     '/',
