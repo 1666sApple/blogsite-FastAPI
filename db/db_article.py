@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session
-from db.models import DBarticles
+from sqlalchemy.orm import Session, joinedload
+from db.models import DBarticles, DBusers
 from exception import StoryException
 from schemas import ArticleBase
 
 def createArticle(db: Session, request: ArticleBase):
     if request.content.startswith('Once Upon a time'):
-        raise StoryException
+        raise StoryException('No stories allowed')
     existing_article = db.query(DBarticles).filter(DBarticles.title == request.title).first()
     if existing_article:
         return None
@@ -21,13 +21,13 @@ def createArticle(db: Session, request: ArticleBase):
     db.commit()
     db.refresh(newArticle)
     
-    return newArticle  
+    return newArticle
 
 def getAllArticle(db: Session):
-    return db.query(DBarticles).all()
+    return db.query(DBarticles).options(joinedload(DBarticles.user)).all()
     
 def getArticle(db: Session, id: int):
-    return db.query(DBarticles).filter(DBarticles.id == id).first()
+    return db.query(DBarticles).options(joinedload(DBarticles.user)).filter(DBarticles.id == id).first()
 
 def updateArticle(db: Session, id: int, request: ArticleBase):
     article = db.query(DBarticles).filter(DBarticles.id == id).first()
@@ -38,11 +38,10 @@ def updateArticle(db: Session, id: int, request: ArticleBase):
     article.title = request.title
     article.content = request.content
     article.published = request.published
-    article.userID = request.userID
     
     db.commit()
     db.refresh(article)
-    return article  # Return the updated article object
+    return getArticle(db, id)
     
 def deleteArticle(db: Session, id: int):
     article = db.query(DBarticles).filter(DBarticles.id == id).first()
