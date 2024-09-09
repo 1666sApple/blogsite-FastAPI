@@ -1,5 +1,18 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
+
+class UserBase(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class User(BaseModel):
+    id: int
+    username: str
+    email: str
+
+    class Config:
+        orm_mode = True
 
 class Article(BaseModel):
     title: str
@@ -9,11 +22,6 @@ class Article(BaseModel):
     class Config:
         orm_mode = True
 
-class UserBase(BaseModel):
-    username: str
-    email: str
-    password: str
-    
 class UserDisplay(BaseModel):
     username: str
     email: str
@@ -21,26 +29,19 @@ class UserDisplay(BaseModel):
     
     class Config:
         orm_mode = True
-        
-class User(BaseModel):
-    id: int
-    username: str
-    email: str
-    
-    class Config:
-        orm_mode = True
-        
+
 class ArticleBase(BaseModel):
     title: str
     content: str
     published: bool
     userID: int
-    
+
 class ArticleDisplay(BaseModel):
+    id: int
     title: str
     content: str
     published: bool
-    user: User
+    user: Optional[User] = None
     
     class Config:
         orm_mode = True
