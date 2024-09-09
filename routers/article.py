@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.post('/', response_model=ArticleDisplay)
-def createArticle(
+def create_article(
     request: ArticleBase,
     db: Session = Depends(getDB),
     current_user: UserBase = Depends(getCurrentUser)
@@ -25,11 +25,11 @@ def createArticle(
     return db_article.getArticle(db, article.id)
 
 @router.get('/', response_model=List[ArticleDisplay])
-def getAllArticles(db: Session = Depends(getDB), current_user: UserBase = Depends(getCurrentUser)):
+def get_All_Articles(db: Session = Depends(getDB), current_user: UserBase = Depends(getCurrentUser)):
     return db_article.getAllArticle(db)
 
 @router.get('/{id}', response_model=ArticleDisplay)
-def readOneArticle(
+def read_One_Article(
     id: int,
     db: Session = Depends(getDB),
     current_user: UserBase = Depends(getCurrentUser)
@@ -42,7 +42,7 @@ def readOneArticle(
     return article
 
 @router.put('/{id}/update', response_model=ArticleDisplay)
-def updateArticle(
+def update_Article(
     id: int,
     request: ArticleBase,
     db: Session = Depends(getDB),
@@ -58,7 +58,7 @@ def updateArticle(
     return updated_article
 
 @router.delete('/{id}/delete')
-def deleteArticle(
+def delete_Article(
     id: int,
     db: Session = Depends(getDB),
     current_user: UserBase = Depends(getCurrentUser)
