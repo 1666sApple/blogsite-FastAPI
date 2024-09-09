@@ -11,6 +11,8 @@ app = FastAPI()
 app.include_router(user.router)
 app.include_router(article.router)
 app.include_router(authentication.router)
+app.include_router(blog_get.router)
+app.include_router(blog_post.router)
 
 @app.exception_handler(StoryException)
 def storyExceptionHandler(request: Request, exc: StoryException):
