@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from auth import authentication
 from exception import StoryException, TermsViolationException
-from routers import article, user
+from routers import article, user, blog_get, blog_post
 from db import models
 from db.database import engine
 
