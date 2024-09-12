@@ -8,6 +8,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from db.database import getDB
 from db.models import DBusers
+from schemas import User
 
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl='token')
 
@@ -46,3 +47,9 @@ def getCurrentUser(token: str = Depends(oauth2Scheme), db: Session = Depends(get
         raise credentials_exception
 
     return user
+
+def getCurrentActiveUser(currentUser: User = Depends(getCurrentUser)):
+    if not currentUser.is_active:
+        raise HTTPException(status_code=400, detail = 'Inactive User')
+
+    return currentUser
