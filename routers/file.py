@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -117,3 +118,20 @@ def delete_file(file_id: int, db: Session = Depends(getDB), current_user: User =
 
     deleteFileRecord(db, file_id)
     return {"detail": "File deleted successfully"}
+
+@router.get('/download/{fileID}')
+def downloadFile(fileID: int, db: Session = Depends(getDB), currentUser: User = Depends(oauth2.getCurrentUser)):
+    file = getFileByID(db, fileID)
+    if not file or file.userID != currentUser.id:
+        raise HTTPException(status_code=404, detail="File not found!")
+    
+    filePath = os.path.join(UPLOAD_DIR, file.storedFileName)
+
+    if not os.path.exists(filePath):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return FileResponse(
+        path=filePath,
+        filename=file.originalFileName,
+        media_type=file.contentType.value
+    )
