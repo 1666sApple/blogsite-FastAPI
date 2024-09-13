@@ -1,7 +1,14 @@
+from email.policy import HTTP
+import os
+from statistics import median_low
 from fastapi.params import File
 from sqlalchemy.orm import Session
 from db.models import DBFileUpload, FileType
 from datetime import datetime
+from fastapi import HTTPException
+from fastapi.responses import FileResponse
+
+
 
 def createFileRecord(
         db: Session, 
@@ -44,3 +51,20 @@ def deleteFileRecord(db: Session, fileID: int):
     if file:
         db.delete(file)
         db.commit()
+
+def downloadFileRecord(db: Session, fileID: int, storagePath: str):
+    file = db.query(DBFileUpload).filter(DBFileUpload.id == fileID).first()
+
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    filePath = os.path.join(storagePath, file.storedFileName)
+
+    if not os.path.exists(filePath):
+        raise HTTPException(status_code=404, detail="File doesn't exist!")
+    
+    return FileResponse(
+        path=filePath,
+        filename=file.originalFileName,
+        media_type=file.contentType
+    )
