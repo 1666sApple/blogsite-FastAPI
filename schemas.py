@@ -1,5 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel
+from datetime import datetime
 
 class UserBase(BaseModel):
     username: str
@@ -43,5 +44,14 @@ class ArticleDisplay(BaseModel):
     published: bool
     user: Optional[User] = None
     
+    class Config:
+        orm_mode = True
+
+class FileResponse(BaseModel):
+    id: int
+    originalFileName: str
+    contentType: str
+    uploadTime: datetime
+
     class Config:
         orm_mode = True
