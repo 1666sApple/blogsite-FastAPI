@@ -1,14 +1,14 @@
 import os
 import shutil
-import uuid
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse as FastAPIFileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import List
 
-from db.db_fileupload import createFileRecord, deleteFileRecord, getFileByID, uploadFileRecord
+from db.db_fileupload import createFileRecord, deleteFileRecord, getFileByName, getFileByID, uploadFileRecord, getAllUserFiles
 from db.database import getDB
-from schemas import User
+from schemas import User, FileResponse
 from auth import oauth2
 from db.models import FileType
 
@@ -32,14 +32,13 @@ def map_content_type(mime_type: str) -> FileType:
     else:
         raise HTTPException(status_code=400, detail="Unsupported file type")
 
-def generate_unique_filename(user_id: int, original_filename: str) -> str:
-    timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-    filename, extension = os.path.splitext(original_filename)
-    return f"{user_id}_{filename}_{timestamp}{extension}"
+def generate_filename(user_id: int, custom_filename: str) -> str:
+    return f"{custom_filename}"
 
 @router.post('/upload')
 def upload_file(
     upload_file: UploadFile = File(...),
+    custom_filename: str = None,
     db: Session = Depends(getDB),
     current_user: User = Depends(oauth2.getCurrentUser)
 ):
@@ -48,8 +47,14 @@ def upload_file(
     except HTTPException as e:
         return e
 
-    unique_filename = generate_unique_filename(current_user.id, upload_file.filename)
-    path = os.path.join(UPLOAD_DIR, unique_filename)
+    if not custom_filename:
+        raise HTTPException(status_code=400, detail="Custom filename is required")
+
+    filename = generate_filename(current_user.id, custom_filename)
+    path = os.path.join(UPLOAD_DIR, filename)
+
+    if os.path.exists(path):
+        raise HTTPException(status_code=400, detail="File with this name already exists")
 
     with open(path, 'wb') as buffer:
         shutil.copyfileobj(upload_file.file, buffer)
@@ -57,81 +62,104 @@ def upload_file(
     file_record = createFileRecord(
         db=db,
         userID=current_user.id,
-        originalFileName=upload_file.filename,
-        storedFileName=unique_filename,
+        originalFileName=custom_filename,
+        storedFileName=filename,
         contentType=content_type,
         uploadTime=datetime.utcnow()
     )
 
-    return {"file": upload_file.filename, "unique_file": unique_filename, "type": content_type.value}
+    return {"file": custom_filename, "stored_file": filename, "type": content_type.value}
 
-@router.get('/{file_id}')
-def retrieve_file(file_id: int, db: Session = Depends(getDB)):
-    file = getFileByID(db, file_id)
+@router.get('/list', response_model=List[FileResponse])
+def list_user_files(db: Session = Depends(getDB), current_user: User = Depends(oauth2.getCurrentUser)):
+    files = getAllUserFiles(db, current_user.id)
+    return [
+        FileResponse(
+            id=file.id,
+            originalFileName=file.originalFileName,
+            contentType=file.contentType.value,
+            uploadTime=file.uploadTime
+        ) for file in files
+    ]
+
+@router.get('/{file_name}')
+def retrieve_file(file_name: str, db: Session = Depends(getDB), current_user: User = Depends(oauth2.getCurrentUser)):
+    file = getFileByName(db, current_user.id, file_name)
     if not file:
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=404, detail="File not found or not owned by the user")
     
-    return {"id": file.id, "original_filename": file.original_filename, "stored_filename": file.stored_filename}
+    return FileResponse(
+        id=file.id,
+        originalFileName=file.originalFileName,
+        contentType=file.contentType.value,
+        uploadTime=file.uploadTime
+    )
 
-@router.put('/{file_id}')
+@router.put('/{file_name}')
 def modify_file(
-    file_id: int,
+    file_name: str,
     upload_file: UploadFile = File(...),
+    custom_filename: str = None,
     db: Session = Depends(getDB),
     current_user: User = Depends(oauth2.getCurrentUser)
 ):
-    file = getFileByID(db, file_id)
-    if not file or file.user_id != current_user.id:
+    file = getFileByName(db, current_user.id, file_name)
+    if not file:
         raise HTTPException(status_code=404, detail="File not found or not owned by the user")
 
     # Delete the existing file
-    old_path = os.path.join(UPLOAD_DIR, file.stored_filename)
+    old_path = os.path.join(UPLOAD_DIR, file.storedFileName)
     if os.path.exists(old_path):
         os.remove(old_path)
 
-    # Save the new file with a unique name
-    unique_filename = generate_unique_filename(current_user.id, upload_file.filename)
-    new_path = os.path.join(UPLOAD_DIR, unique_filename)
+    # Use custom filename if provided, otherwise use the original uploaded file's name
+    if not custom_filename:
+        custom_filename = upload_file.filename
 
+    new_filename = generate_filename(current_user.id, custom_filename)
+    new_path = os.path.join(UPLOAD_DIR, new_filename)
+
+    # Save the new file
     with open(new_path, 'wb') as buffer:
         shutil.copyfileobj(upload_file.file, buffer)
 
+    # Update the file record
     updated_file = uploadFileRecord(
         db=db,
-        file_id=file_id,
-        new_filename=unique_filename,
-        original_filename=upload_file.filename,
+        file_id=file.id,
+        new_filename=new_filename,
+        originalFileName=upload_file.filename,
         content_type=map_content_type(upload_file.content_type)
     )
 
-    return {"id": updated_file.id, "original_filename": updated_file.original_filename, "stored_filename": updated_file.stored_filename}
+    return {"id": updated_file.id, "originalFileName": updated_file.originalFileName, "storedFileName": updated_file.storedFileName}
 
-@router.delete('/{file_id}')
-def delete_file(file_id: int, db: Session = Depends(getDB), current_user: User = Depends(oauth2.getCurrentUser)):
-    file = getFileByID(db, file_id)
-    if not file or file.user_id != current_user.id:
+@router.delete('/{file_name}')
+def delete_file(file_name: str, db: Session = Depends(getDB), current_user: User = Depends(oauth2.getCurrentUser)):
+    file = getFileByName(db, current_user.id, file_name)
+    if not file:
         raise HTTPException(status_code=404, detail="File not found or not owned by the user")
 
-    file_path = os.path.join(UPLOAD_DIR, file.stored_filename)
+    file_path = os.path.join(UPLOAD_DIR, file.storedFileName)
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    deleteFileRecord(db, file_id)
+    deleteFileRecord(db, file.id)
     return {"detail": "File deleted successfully"}
 
-@router.get('/download/{fileID}')
-def downloadFile(fileID: int, db: Session = Depends(getDB), currentUser: User = Depends(oauth2.getCurrentUser)):
-    file = getFileByID(db, fileID)
-    if not file or file.userID != currentUser.id:
-        raise HTTPException(status_code=404, detail="File not found!")
+@router.get('/download/{file_name}')
+def download_file(file_name: str, db: Session = Depends(getDB), current_user: User = Depends(oauth2.getCurrentUser)):
+    file = getFileByName(db, current_user.id, file_name)
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found or not owned by the user")
     
-    filePath = os.path.join(UPLOAD_DIR, file.storedFileName)
+    file_path = os.path.join(UPLOAD_DIR, file.storedFileName)
 
-    if not os.path.exists(filePath):
+    if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     
-    return FileResponse(
-        path=filePath,
+    return FastAPIFileResponse(
+        path=file_path,
         filename=file.originalFileName,
         media_type=file.contentType.value
     )
