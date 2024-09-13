@@ -8,8 +8,6 @@ from datetime import datetime
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 
-
-
 def createFileRecord(
         db: Session, 
         userID: int, 
@@ -32,25 +30,48 @@ def createFileRecord(
     return newFile
 
 def getFileByID(db: Session, fileID: int):
-    return db.query(DBFileUpload).filter(DBFileUpload.id == fileID).first()
-
-def uploadFileRecord(db: Session, fileID: int, newFileName: str, originalFileName: str, contentType: FileType):
     file = db.query(DBFileUpload).filter(DBFileUpload.id == fileID).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    return file
 
-    if file:
-        file.storedFileName = newFileName
-        file.originalFileName = originalFileName
-        file.contentType = contentType
-        db.commit()
-        db.refresh(file)
+def getFileByName(db: Session, user_id: int, file_name: str):
+    file = db.query(DBFileUpload).filter(
+        DBFileUpload.userID == user_id,
+        DBFileUpload.storedFileName == file_name
+    ).first()
+    
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return file
+
+def getAllUserFiles(db: Session, user_id: int):
+    return db.query(DBFileUpload).filter(DBFileUpload.userID == user_id).all()
+
+def uploadFileRecord(db: Session, file_id: int, new_filename: str, originalFileName: str, content_type: FileType):
+    file = db.query(DBFileUpload).filter(DBFileUpload.id == file_id).first()
+
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    file.storedFileName = new_filename
+    file.originalFileName = originalFileName
+    file.contentType = content_type
+    file.uploadTime = datetime.utcnow()
+    db.commit()
+    db.refresh(file)
 
     return file
 
 def deleteFileRecord(db: Session, fileID: int):
-    file = db.query(DBFileUpload).filter(DBFileUpload.id==fileID).first()
-    if file:
-        db.delete(file)
-        db.commit()
+    file = db.query(DBFileUpload).filter(DBFileUpload.id == fileID).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    db.delete(file)
+    db.commit()
+    return {"detail": "File deleted successfully"}
 
 def downloadFileRecord(db: Session, fileID: int, storagePath: str):
     file = db.query(DBFileUpload).filter(DBFileUpload.id == fileID).first()
@@ -66,5 +87,5 @@ def downloadFileRecord(db: Session, fileID: int, storagePath: str):
     return FileResponse(
         path=filePath,
         filename=file.originalFileName,
-        media_type=file.contentType
+        media_type=file.contentType.value
     )
