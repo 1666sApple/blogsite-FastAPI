@@ -16,7 +16,7 @@ A robust and scalable blog platform built with FastAPI, featuring user authentic
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.10+ (Used Python 3.12.5 with all the latest Python packages. Use the mentioned versions for easier access.)
 - pip (Python package manager)
 
 ### Clone the repository
