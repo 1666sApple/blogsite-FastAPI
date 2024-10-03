@@ -80,6 +80,7 @@ blogsite-FastAPI/
 ├── requirements.txt        # Project dependencies
 ├── .gitignore
 ├── .blog.db                # Database
+├── LICENSE.md
 │
 ├── auth/                   # Authentication related modules
 │   ├── __init__.py
