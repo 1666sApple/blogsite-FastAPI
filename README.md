@@ -48,7 +48,11 @@ With the virtual environment activated, install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+Alternatively, install the project as a package using setup.py:
 
+```bash
+pip install .
+```
 ### Set up the database
 
 The project uses SQLAlchemy with SQLite by default. To set up a different database, modify `db/database.py`.
