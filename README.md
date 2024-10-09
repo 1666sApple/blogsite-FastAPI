@@ -73,6 +73,34 @@ uvicorn main:app --reload
 
 The server will be available at `http://127.0.0.1:8000`. You can access the interactive API documentation at `http://127.0.0.1:8000/docs`.
 
+## Docker Containerization
+### Build the Docker Image
+To build the Docker image for the application, run the following command from the project directory:
+
+```bash
+docker build -t blogsite-fastapi:0.0.1 .
+```
+### Run the Docker Container
+After building the Docker image, you can run it with:
+
+```bash
+docker run -d -p 8000:8000 blogsite-fastapi:0.0.1
+```
+This will start the container and expose the application on `http://localhost:8000`. You can access the API documentation at `http://localhost:8000/docs`(swagger ui) or `http://localhost:8000/redoc`(redoc ui).
+
+### Stopping the Docker Container
+To stop the running Docker container, first find the container ID with:
+
+```bash
+docker ps
+```
+Then stop the container using the following command:
+
+```bash
+docker stop <CONTAINER_ID>
+```
+Replace `<CONTAINER_ID>` with the actual ID of the running container.
+
 ## Project Structure
 
 ```
