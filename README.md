@@ -73,39 +73,42 @@ The server will be available at `http://127.0.0.1:8000`. You can access the inte
 
 ```
 blogsite-FastAPI/
+└── src/
+│    ├── main.py                 # Application entry point
+│    ├── schemas.py
+│    ├── exception.py
+│    ├── .blog.db                # Database
+│    ├── __init__.py
+│    │
+│    ├── auth/                   # Authentication related modules
+│    │   ├── __init__.py
+│    │   ├── auth.py
+│    │   ├── oauth2.py
+│    │   └── authentication.py
+│    │
+│    ├── routers/                # API route definitions
+│    │   ├── __init__.py
+│    │   ├── blog_get.py
+│    │   ├── blog_post.py
+│    │   ├── article.py
+│    │   ├── user.py
+│    │   └── file.py
+│    │
+│    ├── db/                     # Database models and connection
+│    │   ├── __init__.py
+│    │   ├── database.py
+│    │   ├── db_article.py
+│    │   ├── db_fileupload.py
+│    │   ├── db_user.py
+│    │   ├── hash.py
+│    │   └── models.py
+│    │
+│    └── Files/                 # Custom File Uploads
 │
-├── main.py                 # Application entry point
-├── schemas.py
-├── exception.py
+├── README.md│
 ├── requirements.txt        # Project dependencies
 ├── .gitignore
-├── .blog.db                # Database
-├── LICENSE.md
-│
-├── auth/                   # Authentication related modules
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── oauth2.py
-│   └── authentication.py
-│
-├── routers/                # API route definitions
-│   ├── __init__.py
-│   ├── blog_get.py
-│   ├── blog_post.py
-│   ├── article.py
-│   ├── user.py
-│   └── file.py
-│
-├── db/                     # Database models and connection
-│   ├── __init__.py
-│   ├── database.py
-│   ├── db_article.py
-│   ├── db_fileupload.py
-│   ├── db_user.py
-│   ├── hash.py
-│   └── models.py
-│
-└── Files/              # Custom File Upload
+└── LICENSE.md
 ```
 
 ## API Endpoints
