@@ -1,7 +1,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String, Boolean
-from db.database import Base
+from src.db.database import Base
 from sqlalchemy import Column, DateTime, Enum
 from enum import Enum as PyEnum
 class DBusers(Base):

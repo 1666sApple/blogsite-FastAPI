@@ -6,18 +6,18 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
 
-from db.db_fileupload import createFileRecord, deleteFileRecord, getFileByName, getFileByID, uploadFileRecord, getAllUserFiles
-from db.database import getDB
-from schemas import User, FileResponse
-from auth import oauth2
-from db.models import FileType
+from src.db.db_fileupload import createFileRecord, deleteFileRecord, getFileByName, getFileByID, uploadFileRecord, getAllUserFiles
+from src.db.database import getDB
+from src.schemas import User, FileResponse
+from src.auth import oauth2
+from src.db.models import FileType
 
 router = APIRouter(
     prefix='/file',
     tags=['file']
 )
 
-UPLOAD_DIR = 'files/'
+UPLOAD_DIR = 'src/files/'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def map_content_type(mime_type: str) -> FileType:

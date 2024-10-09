@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
-from db.models import DBarticles, DBusers
-from exception import StoryException
-from schemas import ArticleBase
+from src.db.models import DBarticles, DBusers
+from src.exception import StoryException
+from src.schemas import ArticleBase
 
 def createArticle(db: Session, request: ArticleBase):
     if request.content.startswith('Once Upon a time'):

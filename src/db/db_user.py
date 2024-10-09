@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm.session import Session
-from db.hash import Hash
-from db.models import DBusers
-from schemas import UserBase
+from src.db.hash import Hash
+from src.db.models import DBusers
+from src.schemas import UserBase
 
 def createUser(db: Session, request: UserBase):
     user = db.query(DBusers).filter((DBusers.username == request.username) | (DBusers.email == request.email)).first()

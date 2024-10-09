@@ -1,10 +1,10 @@
 from typing_extensions import Required
 from fastapi import FastAPI, status, Response, APIRouter, Depends
-from routers.blog_post import required_fn
+from src.routers.blog_post import required_fn
 from enum import Enum
 from typing import Optional
 
-from routers.blog_post import required_fn
+from src.routers.blog_post import required_fn
 
 router = APIRouter(
     prefix='/blog',

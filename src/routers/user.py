@@ -2,9 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm.session import Session
 
-from db import db_user
-from db.database import getDB
-from schemas import UserBase, UserDisplay
+from src.db import db_user
+from src.db.database import getDB
+from src.schemas import UserBase, UserDisplay
 
 router = APIRouter(prefix='/user', tags=['user'])
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from auth.oauth2 import createAccessToken
-from db.database import getDB
-from db.db_user import getUserByUsername
-from db.hash import Hash
+from src.auth.oauth2 import createAccessToken
+from src.db.database import getDB
+from src.db.db_user import getUserByUsername
+from src.db.hash import Hash
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 

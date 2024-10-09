@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from auth import authentication
-from exception import StoryException, TermsViolationException
-from routers import article, file, user, blog_get, blog_post
-from db import models
-from db.database import engine
+from src.auth import authentication
+from src.exception import StoryException, TermsViolationException
+from src.routers import article, file, user, blog_get, blog_post
+from src.db import models
+from src.db.database import engine
 
 
 app = FastAPI()

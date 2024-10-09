@@ -3,7 +3,7 @@ import os
 from statistics import median_low
 from fastapi.params import File
 from sqlalchemy.orm import Session
-from db.models import DBFileUpload, FileType
+from src.db.models import DBFileUpload, FileType
 from datetime import datetime
 from fastapi import HTTPException
 from fastapi.responses import FileResponse

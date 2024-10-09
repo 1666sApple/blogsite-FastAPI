@@ -1,11 +1,11 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from auth.oauth2 import getCurrentUser
-from db import db_article
-from db.database import getDB
-from schemas import ArticleBase, ArticleDisplay, UserBase
-from exception import TermsViolationException
+from src.auth.oauth2 import getCurrentUser
+from src.db import db_article
+from src.db.database import getDB
+from src.schemas import ArticleBase, ArticleDisplay, UserBase
+from src.exception import TermsViolationException
 
 router = APIRouter(
     prefix='/article',

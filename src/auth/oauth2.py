@@ -6,9 +6,9 @@ from typing import Optional
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from db.database import getDB
-from db.models import DBusers
-from schemas import User
+from src.db.database import getDB
+from src.db.models import DBusers
+from src.schemas import User
 
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl='token')
 
